@@ -5,8 +5,58 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AcmClient"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        WindowStyle="None"
+        Name="Window"
+        Title="AcmClient" Height="400" Width="525" 
+        AllowsTransparency="True">
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0" Name="TitleDock" Background="#FFFF5959" Height="30" VerticalAlignment="Top">
+            <TextBlock  DockPanel.Dock="Right"
+                        Margin="10,0,0,0"
+                        Text="{Binding Title,ElementName=Window}" 
+                        FontSize="15"
+                        VerticalAlignment="Center" FontWeight="Bold" Foreground="White"
+                          />
+        </DockPanel>
+        <DockPanel Name="ActiveWindow" Grid.Row="1"
+                   Background="#eeeeee">
+            <TabControl Style="{StaticResource TabCotrolStyle}"
+                        TabStripPlacement="Left" Name="Tab" 
+                        Width="{Binding ActualWidth,ElementName=ActiveWindow}"
+                        >
+                <TabItem Style="{StaticResource TabItemStyle}">
+                    <TabItem.Header>
+                        <Button  Style="{StaticResource TabButton}"
+                                 Content="tab1"/>
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem Style="{StaticResource TabItemStyle}">
+                    <TabItem.Header>
+
+                        <Button Style="{StaticResource TabButton}"
+                                Content="tab2" />
+                    
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem Style="{StaticResource TabItemStyle}">
+                    <TabItem.Header>
+
+                        <Button Style="{StaticResource TabButton}"
+                                Content="tab3" />
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem Style="{StaticResource TabItemStyle}">
+                    <TabItem.Header>
+                        <Button Style="{StaticResource TabButton}"
+                                Content="tab4" />
+                      
+                    </TabItem.Header>
+                </TabItem>
+            </TabControl> 
+        </DockPanel>
     </Grid>
 </Window>
