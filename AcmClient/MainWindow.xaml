@@ -1,62 +1,31 @@
-﻿<Window x:Class="AcmClient.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:AcmClient"
-        mc:Ignorable="d"
-        WindowStyle="None"
-        Name="Window"
-        Title="AcmClient" Height="400" Width="525" 
-        AllowsTransparency="True">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <DockPanel Grid.Row="0" Name="TitleDock" Background="#FFFF5959" Height="30" VerticalAlignment="Top">
-            <TextBlock  DockPanel.Dock="Right"
-                        Margin="10,0,0,0"
-                        Text="{Binding Title,ElementName=Window}" 
-                        FontSize="15"
-                        VerticalAlignment="Center" FontWeight="Bold" Foreground="White"
-                          />
-        </DockPanel>
-        <DockPanel Name="ActiveWindow" Grid.Row="1"
-                   Background="#eeeeee">
-            <TabControl Style="{StaticResource TabCotrolStyle}"
-                        TabStripPlacement="Left" Name="Tab" 
-                        Width="{Binding ActualWidth,ElementName=ActiveWindow}"
-                        >
-                <TabItem Style="{StaticResource TabItemStyle}">
-                    <TabItem.Header>
-                        <Button  Style="{StaticResource TabButton}"
-                                 Content="tab1"/>
-                    </TabItem.Header>
-                </TabItem>
-                <TabItem Style="{StaticResource TabItemStyle}">
-                    <TabItem.Header>
+﻿<controls:MetroWindow
+	xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+	x:Class="AcmClient.MainWindow"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:local="clr-namespace:AcmClient"
+	mc:Ignorable="d"
+	Name="Window"
+	Title="AcmClient"
+	Height="400"
+	Width="525"
+	AllowsTransparency="True">
+	<Grid>
+		<TabControl Name="tab">
+			<TabItem Header="个人信息">
+				
+				<Grid Name="personalPage"></Grid>
+			</TabItem>
+			<TabItem Header="题目分类">
+			
+			</TabItem>
+			<TabItem Header="题目页面">
+			
+			</TabItem>
+			
+		</TabControl>
+	</Grid>
 
-                        <Button Style="{StaticResource TabButton}"
-                                Content="tab2" />
-                    
-                    </TabItem.Header>
-                </TabItem>
-                <TabItem Style="{StaticResource TabItemStyle}">
-                    <TabItem.Header>
-
-                        <Button Style="{StaticResource TabButton}"
-                                Content="tab3" />
-                    </TabItem.Header>
-                </TabItem>
-                <TabItem Style="{StaticResource TabItemStyle}">
-                    <TabItem.Header>
-                        <Button Style="{StaticResource TabButton}"
-                                Content="tab4" />
-                      
-                    </TabItem.Header>
-                </TabItem>
-            </TabControl> 
-        </DockPanel>
-    </Grid>
-</Window>
+</controls:MetroWindow>
