@@ -15,6 +15,12 @@ using System.Windows.Shapes;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Newtonsoft.Json;
+using AngleSharp;
+using AngleSharp.Extensions;
+using System.Web;
+using System.Net.Http;
+using AngleSharp.Parser.Html;
+
 namespace AcmClient
 {
 	/// <summary>
@@ -44,7 +50,7 @@ namespace AcmClient
                 }
                 else
                 {
-                    Console.WriteLine(user.Password);
+                    hduHttpHelper.getPersonalInfo(user);
                 }
             }
         }
@@ -74,5 +80,43 @@ class hduUser
         String str = JsonConvert.SerializeObject(user);
         Console.WriteLine(str);
         System.IO.File.WriteAllText(@"user.json", str, Encoding.UTF8);
+    }
+}
+class hduHttpHelper
+{
+    static String url = "http://acm.hdu.edu.cn/";
+    static String loginUrl = "http://acm.hdu.edu.cn/userloginex.php?action=login";
+    static String userStateUrl = "http://acm.hdu.edu.cn/userstatus.php?user=";
+    static HttpClient client;
+    static HttpClient initClient()
+    {
+        HttpClient client = new HttpClient();
+        client.MaxResponseContentBufferSize = 256000;
+        client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36");
+        return client;
+    }
+    static async void login(hduUser user)
+    {
+        client = initClient();
+        HttpResponseMessage response;
+        List<KeyValuePair<String, String>> form = new List<KeyValuePair<string, string>>();
+        form.Add(new KeyValuePair<string, string>("username", user.UserName));
+        form.Add(new KeyValuePair<string, string>("userpass", user.Password));
+        form.Add(new KeyValuePair<string, string>("login", "Sign In"));
+        response = client.PostAsync(new Url(loginUrl), new FormUrlEncodedContent(form)).Result;
+    }
+    static async public void getPersonalInfo(hduUser user)
+    {
+        login(user);
+        String userUrl = userStateUrl + user.UserName;
+        HttpResponseMessage response;
+        response = await client.GetAsync(new Url(userUrl));
+        var responseString = await response.Content.ReadAsStringAsync();
+        var parser = new HtmlParser();
+        var document = parser.Parse(responseString);
+        var tables = document.All.Where(m => m.LocalName == "table" && m.GetAttribute("width") == "90%");
+        var table = tables.First();
+        var td=table.GetElementsByTagName("td").First();
+        Console.WriteLine(td.Text());
     }
 }
