@@ -15,8 +15,9 @@
 	<Grid>
 		<TabControl Name="tab">
 			<TabItem Header="个人信息">
+				<Grid Name="personalPage">
 				
-				<Grid Name="personalPage"></Grid>
+				</Grid>
 			</TabItem>
 			<TabItem Header="题目分类">
 			

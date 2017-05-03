@@ -20,6 +20,7 @@ using AngleSharp.Extensions;
 using System.Web;
 using System.Net.Http;
 using AngleSharp.Parser.Html;
+using System.Text.RegularExpressions;
 
 namespace AcmClient
 {
@@ -117,6 +118,56 @@ class hduHttpHelper
         var tables = document.All.Where(m => m.LocalName == "table" && m.GetAttribute("width") == "90%");
         var table = tables.First();
         var td=table.GetElementsByTagName("td").First();
-        Console.WriteLine(td.Text());
+        var elements = td.Children;
+      
+        userInfomation nowUser = new userInfomation();
+        nowUser.nickName = elements[0].Text();
+        Regex schoolRex = new Regex(@"^.*registered");
+        String temp = schoolRex.Match(elements[1].Text()).Value;
+        nowUser.School = temp.Substring(6, temp.Length - 20);
+        temp = elements[1].Text().Substring(elements[1].Text().Length - 10);
+        nowUser.regData = new userInfomation.Date(temp);
+        //Console.WriteLine(nowUser.regData.ToString());
+        nowUser.Motto = elements[3].Text();
+        var valueTable = elements[5].Children.First().Children;
+        var rk = Int32.Parse(valueTable[1].LastElementChild.Text());
+        var sub= Int32.Parse(valueTable[2].LastElementChild.Text());
+        var sov= Int32.Parse(valueTable[3].LastElementChild.Text());
+        nowUser.value = new userInfomation.learnValue(rk, sub, sov);
     }
+}
+class userInfomation
+{ 
+    public String nickName;
+    public String School;
+    public String Motto;
+    public class Date
+    {
+        int year, month, day;
+        public Date(String date)
+        {
+            String[] th = date.Split('-');
+            year = Int32.Parse(th[0]);
+            month = Int32.Parse(th[1]);
+            day = Int32.Parse(th[2]);
+        }
+        override
+        public String ToString()
+        {
+            return " "+year+" "+month+" "+day;
+        }
+    }
+    public Date regData;
+    public class learnValue
+    {
+        int Rank;
+        int Submitted;
+        int Solved;
+        public learnValue(int rk,int sub,int sov)
+        {
+            Rank = rk;Submitted = sub;Solved = sov;
+        }
+    }
+    public learnValue value;
+
 }
