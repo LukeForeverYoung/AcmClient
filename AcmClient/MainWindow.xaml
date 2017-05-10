@@ -5,18 +5,73 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
 	xmlns:local="clr-namespace:AcmClient"
+	TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+	TextOptions.TextFormattingMode="Ideal" 
+    TextOptions.TextRenderingMode="Auto"  
 	mc:Ignorable="d"
 	Name="Window"
 	Title="AcmClient"
-	Height="400"
-	Width="525"
+	Height="600"
+	Width="800"
 	AllowsTransparency="True">
 	<Grid>
 		<TabControl Name="tab">
 			<TabItem Header="个人信息">
 				<Grid Name="personalPage">
-				
+					<Grid.RowDefinitions>
+						<RowDefinition Height="1*"/>
+						<RowDefinition Height="2*"/>
+					</Grid.RowDefinitions>
+					<materialDesign:Card Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="20,20,20,20">
+						<Grid Name="DataBinding">
+							<Grid.Resources>
+								<Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignBody1TextBlock}"/>
+							</Grid.Resources>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="3*"/>
+								<ColumnDefinition Width="4*"/>
+								<ColumnDefinition Width="1*"/>
+							</Grid.ColumnDefinitions>
+
+							
+							<Grid Name="ValueInfo" Grid.Column="0">
+								
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="1*"/>
+									<ColumnDefinition Width="1*"/>
+								</Grid.ColumnDefinitions>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="1*"/>
+									<RowDefinition Height="1*"/>
+									<RowDefinition Height="1*"/>
+								</Grid.RowDefinitions>
+								<TextBlock  VerticalAlignment="Center" Grid.Column="0" Grid.Row="0" Text="Rank: "/>
+								<TextBlock  VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" Text="Problems Submitted: "/>
+								<TextBlock VerticalAlignment="Center" Grid.Column="0" Grid.Row="2" Text="Problems Solved: "/>
+								<TextBlock  VerticalAlignment="Center" Grid.Column="1" Grid.Row="0" Text="{Binding Rank}"/>
+								<TextBlock  VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Text="{Binding Submitted}"/>
+								<TextBlock VerticalAlignment="Center" Grid.Column="1" Grid.Row="2" Text="{Binding Solved}"/>
+							</Grid>
+							<GridSplitter IsEnabled="False" Grid.Column="1" Width="2" HorizontalAlignment="Stretch" Margin="10.333,0,362,0"/>
+							<Grid Name="UserBlock" Grid.Column="2">
+								<Grid.RowDefinitions>
+									<RowDefinition Height="5*"/>
+									<RowDefinition Height="2*"/>
+									<RowDefinition Height="1*"/>
+								</Grid.RowDefinitions>
+								<Image Grid.Row="0" 
+									Source="/Sources/icon.jpg"
+									Width="{Binding Path=Width,RelativeSource={RelativeSource Mode=FindAncestor , AncestorType={x:Type Grid}}}"
+									/>
+								<TextBlock Grid.Row="1" Text="{Binding nickName}" FontSize="15"/>
+								<TextBlock Grid.Row="2" Text="{Binding Motto}" />
+							</Grid>
+						</Grid>
+					</materialDesign:Card>
+					<Grid Grid.Row="1">
+					</Grid>
 				</Grid>
 			</TabItem>
 			<TabItem Header="题目分类">

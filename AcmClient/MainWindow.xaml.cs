@@ -21,15 +21,18 @@ using System.Web;
 using System.Net.Http;
 using AngleSharp.Parser.Html;
 using System.Text.RegularExpressions;
+using System.ComponentModel;
+using AcmClient;
 
 namespace AcmClient
 {
 	/// <summary>
 	/// MainWindow.xaml 的交互逻辑
 	/// </summary>
+    /// 
 	public partial class MainWindow : MetroWindow
 	{
-		public MainWindow()
+        public MainWindow()
 		{
 			InitializeComponent();
             tab.SelectionChanged += Tab_SelectionChangedAsync;
@@ -51,12 +54,24 @@ namespace AcmClient
                 }
                 else
                 {
-                    hduHttpHelper.getPersonalInfo(user);
+                    hduHttpHelper.getPersonalInfo(user,this);
                 }
             }
         }
      
-     
+        private void setInfoValueLine(object sender,EventArgs e)
+        {
+            var height = ValueInfo.ActualHeight;
+            var width = ValueInfo.ActualWidth;
+            Console.WriteLine(height + "  " + width);
+            Line InfoValueLine = new Line();
+            InfoValueLine.Height = height;
+            InfoValueLine.X1=InfoValueLine.X2 = width;
+            InfoValueLine.Y1 = 10;
+            InfoValueLine.Y2 = height - 10;
+            InfoValueLine.Stroke = Brushes.LightGray;
+            ValueInfo.Children.Add(InfoValueLine);
+        }
         
     }
 }
@@ -106,7 +121,7 @@ class hduHttpHelper
         form.Add(new KeyValuePair<string, string>("login", "Sign In"));
         response = client.PostAsync(new Url(loginUrl), new FormUrlEncodedContent(form)).Result;
     }
-    static async public void getPersonalInfo(hduUser user)
+    static async public void getPersonalInfo(hduUser user , MainWindow mainWindow)
     {
         login(user);
         String userUrl = userStateUrl + user.UserName;
@@ -119,31 +134,71 @@ class hduHttpHelper
         var table = tables.First();
         var td=table.GetElementsByTagName("td").First();
         var elements = td.Children;
-      
         userInfomation nowUser = new userInfomation();
+        nowUser = new userInfomation();
         nowUser.nickName = elements[0].Text();
         Regex schoolRex = new Regex(@"^.*registered");
         String temp = schoolRex.Match(elements[1].Text()).Value;
         nowUser.School = temp.Substring(6, temp.Length - 20);
         temp = elements[1].Text().Substring(elements[1].Text().Length - 10);
         nowUser.regData = new userInfomation.Date(temp);
+        nowUser.registerDate = nowUser.regData.ToString();
         //Console.WriteLine(nowUser.regData.ToString());
         nowUser.Motto = elements[3].Text();
         var valueTable = elements[5].Children.First().Children;
         var rk = Int32.Parse(valueTable[1].LastElementChild.Text());
         var sub= Int32.Parse(valueTable[2].LastElementChild.Text());
         var sov= Int32.Parse(valueTable[3].LastElementChild.Text());
-        nowUser.value = new userInfomation.learnValue(rk, sub, sov);
+        nowUser.setSubmitValue(rk, sub, sov);
+        mainWindow.DataBinding.DataContext = nowUser;
     }
 }
-class userInfomation
+class userInfomation : INotifyPropertyChanged
 { 
-    public String nickName;
-    public String School;
-    public String Motto;
+    String _nickName;
+    String _School;
+    String _Motto;
+    String _registerDate;
+    public String nickName
+    {
+        get { return _nickName; }
+        set
+        {
+            _nickName = value;
+           // OnPropertyChanged("nickName");
+        }
+    }
+    public String School
+    {
+        get { return _School; }
+        set
+        {
+            _School = value;
+            //OnPropertyChanged("School");
+
+        }
+    }
+    public String Motto
+    {
+        get { return _Motto; }
+        set
+        {
+            _Motto = value;
+           // OnPropertyChanged("Motto");
+        }
+    }
+    public String registerDate
+    {
+        get { return _registerDate; }
+        set
+        {
+            _registerDate=value;
+            //OnPropertyChanged("registerDate");
+        }
+    }
     public class Date
     {
-        int year, month, day;
+        public int year, month, day;
         public Date(String date)
         {
             String[] th = date.Split('-');
@@ -154,20 +209,50 @@ class userInfomation
         override
         public String ToString()
         {
-            return " "+year+" "+month+" "+day;
+            return year.ToString("0000")+"/"+month.ToString("00")+"/"+day.ToString("00");
         }
     }
     public Date regData;
-    public class learnValue
+    public int Rank
     {
-        int Rank;
-        int Submitted;
-        int Solved;
-        public learnValue(int rk,int sub,int sov)
+        get { return _Rank; }
+        set
         {
-            Rank = rk;Submitted = sub;Solved = sov;
+            _Rank = value;
+            //OnPropertyChanged("Rank");
         }
     }
-    public learnValue value;
-
+    public int Submitted
+    {
+        get { return _Submitted; }
+        set
+        {
+            _Submitted = value;
+            //OnPropertyChanged("Submitted");
+        }
+    }
+    public int Solved
+    {
+        get { return _Solved; }
+        set
+        {
+            _Solved = value;
+           // OnPropertyChanged("Solved");
+        }
+    }
+    int _Rank;
+    int _Submitted;
+    int _Solved;
+    public void setSubmitValue(int rk, int sub, int sov)
+    {
+        Rank = rk; Submitted = sub; Solved = sov;
+    }
+    public event PropertyChangedEventHandler PropertyChanged;
+    protected void PropertyChangedNotify(string propertyName)
+    {
+        if(propertyName!=null)
+        {
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
 }
