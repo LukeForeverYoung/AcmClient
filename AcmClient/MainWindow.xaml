@@ -16,9 +16,10 @@
 	Height="600"
 	Width="800"
 	AllowsTransparency="True">
-	<Grid>
-		<TabControl Name="tab">
-			<TabItem Header="个人信息">
+	<Grid Background="#CCFFFF">
+
+		<TabControl Name="tab" Foreground="White">
+			<TabItem Header="个人信息" Background="#CCFFFF">
 				<Grid Name="personalPage">
 					<Grid.RowDefinitions>
 						<RowDefinition Height="1*"/>
@@ -76,11 +77,28 @@
 					</Grid>
 				</Grid>
 			</TabItem>
-			<TabItem Header="题目分类">
+			<TabItem Header="题目分类" Background="#CCFFFF">
 			
 			</TabItem>
-			<TabItem Header="题目页面">
-			
+			<TabItem Header="题目页面" Background="#CCFFFF">
+				<StackPanel Orientation="Vertical">
+					<DockPanel >
+						<ComboBox DockPanel.Dock="Left" Width="50" SelectedIndex="0">
+							<ComboBoxItem Content="111"/>
+							<ComboBoxItem Content="222"/>
+						</ComboBox>
+						<TextBlock Text="Head" Width="500" 
+							VerticalAlignment="Center" TextAlignment="Center"/>
+						<Button Style="{StaticResource MaterialDesignRaisedButton}"  DockPanel.Dock="Right" Content="搜索"/>
+						<TextBox DockPanel.Dock="Right" Text="搜索题目"
+							Margin="0,0,10,0"
+							BorderBrush="LightBlue"/>
+						
+					</DockPanel>
+					<Grid>
+					
+					</Grid>
+				</StackPanel>
 			</TabItem>
 			
 		</TabControl>

@@ -32,30 +32,51 @@ namespace AcmClient
     /// 
 	public partial class MainWindow : MetroWindow
 	{
+        hduUser user;
         public MainWindow()
 		{
-			InitializeComponent();
+            user = hduUser.readUserJson();
+            InitializeComponent();
             tab.SelectionChanged += Tab_SelectionChangedAsync;
 		}
 
         private async void Tab_SelectionChangedAsync(object sender, SelectionChangedEventArgs e)
         {
             TabControl x = sender as TabControl;
+            switch (x.SelectedIndex)
+            {
+                case 0:
+                    {
+                        
+                        if (user == null)
+                        {
+                            LoginDialogData result = await this.ShowLoginAsync("请先登录hdu账号", "输入账号与密码", new LoginDialogSettings { ColorScheme = this.MetroDialogOptions.ColorScheme, InitialUsername = "UserName" });
+                            String username = result.Username;
+                            String password = result.Password;
+                            user = new hduUser(username, password);
+                            hduUser.setUserJson(user);
+                        }
+                        else
+                        {
+                            hduHttpHelper.getPersonalInfo(user, this);
+                        }
+                    }
+                    break;
+                case 2:
+                    {
+                        if(user==null)
+                        {
+                            Console.WriteLine("no user error!");
+                            return;
+                        }
+                        hduHttpHelper.getProblemInfo(user,"1001",this);
+                    }
+                    break;
+            }
+
             if (x.SelectedIndex == 0)
             {
-                hduUser user=hduUser.readUserJson();
-                if(user==null)
-                {
-                    LoginDialogData result = await this.ShowLoginAsync("请先登录hdu账号", "输入账号与密码", new LoginDialogSettings { ColorScheme = this.MetroDialogOptions.ColorScheme, InitialUsername = "UserName" });
-                    String username = result.Username;
-                    String password = result.Password;
-                    user = new hduUser(username, password);
-                    hduUser.setUserJson(user);
-                }
-                else
-                {
-                    hduHttpHelper.getPersonalInfo(user,this);
-                }
+                
             }
         }
      
@@ -151,6 +172,20 @@ class hduHttpHelper
         var sov= Int32.Parse(valueTable[3].LastElementChild.Text());
         nowUser.setSubmitValue(rk, sub, sov);
         mainWindow.DataBinding.DataContext = nowUser;
+    }
+    static async public void getProblemInfo(hduUser user,String problemID,Window mainWindow)
+    {
+        problemInfomation nowProblem = new problemInfomation();
+
+        login(user);
+        String problemUrl = "http://acm.hdu.edu.cn/showproblem.php?pid="+problemID;
+        HttpResponseMessage response;
+        response = await client.GetAsync(new Url(problemUrl));
+        var responseString = await response.Content.ReadAsStringAsync();
+        var parser = new HtmlParser();
+        var document = parser.Parse(responseString);
+        var problemMain=document.All.Where(m => m.LocalName == "tbody").First().Children[3].Children[0];
+        Console.WriteLine(problemMain.ToHtml());
     }
 }
 class userInfomation : INotifyPropertyChanged
@@ -251,6 +286,89 @@ class userInfomation : INotifyPropertyChanged
     protected void PropertyChangedNotify(string propertyName)
     {
         if(propertyName!=null)
+        {
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+}
+class problemInfomation :INotifyPropertyChanged
+{
+    String _problemName;
+    public String problemName
+    {
+        get { return _problemName; }
+        set
+        {
+            _problemName = value;
+        }
+    }
+    int _totSubmitted;
+    public int totSubmitted
+    {
+        get { return _totSubmitted; }
+        set
+        {
+            _totSubmitted = value;
+        }
+    }
+    int _totAccepted;
+    public int totAccepted
+    {
+        get { return _totAccepted; }
+        set
+        {
+            _totAccepted = value;
+        }
+    }
+    String _Description;
+    public String Description
+    {
+        get { return _Description; }
+        set
+        {
+            _Description = value;
+        }
+    }
+    String _Input;
+    public String Input
+    {
+        get { return _Input; }
+        set
+        {
+            _Input = value;
+        }
+    }
+    String _Output;
+    public String Output
+    {
+        get { return _Output; }
+        set
+        {
+            _Output = value;
+        }
+    }
+    String _sampleInput;
+    public String sampleInput
+    {
+        get { return _sampleInput; }
+        set
+        {
+            _sampleInput = value;
+        }
+    }
+    String _sampleOutput;
+    public String sampleOutput
+    {
+        get { return _sampleOutput; }
+        set
+        {
+            _sampleOutput = value;
+        }
+    }
+    public event PropertyChangedEventHandler PropertyChanged;
+    protected void PropertyChangedNotify(string propertyName)
+    {
+        if (propertyName != null)
         {
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
