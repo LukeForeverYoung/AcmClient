@@ -32,9 +32,12 @@ namespace AcmClient
     /// 
 	public partial class MainWindow : MetroWindow
 	{
+        
         hduUser user;
+        problemInfomation problem;
         public MainWindow()
 		{
+            
             user = hduUser.readUserJson();
             InitializeComponent();
             tab.SelectionChanged += Tab_SelectionChangedAsync;
@@ -69,7 +72,9 @@ namespace AcmClient
                             Console.WriteLine("no user error!");
                             return;
                         }
-                        hduHttpHelper.getProblemInfo(user,"1001",this);
+                        problem = new problemInfomation();
+                        hduHttpHelper.getProblemInfo(user,problem,"1001",this);
+                        
                     }
                     break;
             }
@@ -93,7 +98,11 @@ namespace AcmClient
             InfoValueLine.Stroke = Brushes.LightGray;
             ValueInfo.Children.Add(InfoValueLine);
         }
-        
+
+        private void CopyInput(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetDataObject(problem.sampleInput, true);
+        }
     }
 }
 class hduUser
@@ -173,7 +182,7 @@ class hduHttpHelper
         nowUser.setSubmitValue(rk, sub, sov);
         mainWindow.DataBinding.DataContext = nowUser;
     }
-    static async public void getProblemInfo(hduUser user,String problemID,Window mainWindow)
+    static async public void getProblemInfo(hduUser user,problemInfomation problem,String problemID,MainWindow mainWindow)
     {
         problemInfomation nowProblem = new problemInfomation();
 
@@ -185,7 +194,42 @@ class hduHttpHelper
         var parser = new HtmlParser();
         var document = parser.Parse(responseString);
         var problemMain=document.All.Where(m => m.LocalName == "tbody").First().Children[3].Children[0];
-        Console.WriteLine(problemMain.ToHtml());
+        //Console.WriteLine(problemMain.ToHtml());
+        problem.problemName = problemMain.FirstChild.Text();
+        problem.problemValue = getTextWithWrap(problemMain.Children[1].FirstChild.FirstChild.ChildNodes);
+        problem.Description= getTextWithWrap(problemMain.Children[5].ChildNodes);
+        problem.Input=getTextWithWrap(problemMain.Children[9].ChildNodes);
+        problem.Output=getTextWithWrap(problemMain.Children[13].ChildNodes);
+        problem.sampleInput=getTextWithWrap(problemMain.Children[17].FirstChild.ChildNodes);
+        problem.sampleOutput=getTextWithWrap(problemMain.Children[21].FirstChild.ChildNodes);
+        mainWindow.ProblemPage.DataContext = problem;
+
+        //Console.WriteLine(problem.problemValue);
+    }
+    static private String getTextWithWrap(AngleSharp.Dom.INodeList NodeList)
+    {
+        var tempString = "";
+        foreach (var ele in NodeList)
+        {
+            //Console.WriteLine(ele.NodeName);
+            if (ele.NodeName == "BR")
+                //tempString += "\r\n";
+                tempString += Environment.NewLine;
+            else
+            {
+                String AddedWrap=ele.Text();
+                for(int i=0;i<AddedWrap.Length;i++)
+                {
+                    if (AddedWrap[i] != '\n')
+                        tempString += AddedWrap[i];
+                    else
+                        tempString += Environment.NewLine;
+                }
+                
+            }
+                
+        }
+        return tempString;
     }
 }
 class userInfomation : INotifyPropertyChanged
@@ -302,23 +346,11 @@ class problemInfomation :INotifyPropertyChanged
             _problemName = value;
         }
     }
-    int _totSubmitted;
-    public int totSubmitted
+    String _problemValue;
+    public String problemValue
     {
-        get { return _totSubmitted; }
-        set
-        {
-            _totSubmitted = value;
-        }
-    }
-    int _totAccepted;
-    public int totAccepted
-    {
-        get { return _totAccepted; }
-        set
-        {
-            _totAccepted = value;
-        }
+        get { return _problemValue; }
+        set { _problemValue = value; }
     }
     String _Description;
     public String Description
