@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MahApps.Metro.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,17 +12,24 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-
+using AcmClient;
 namespace AcmClient
 {
     /// <summary>
     /// SubmitWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class SubmitWindow : Window
+    public partial class SubmitWindow : MetroWindow
     {
-        public SubmitWindow()
+        hduUser user;
+        public SubmitWindow(hduUser user)
         {
+            
             InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            hduHttpHelper.submit(user,)
         }
     }
 }

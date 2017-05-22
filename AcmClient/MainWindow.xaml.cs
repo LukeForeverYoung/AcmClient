@@ -59,10 +59,9 @@ namespace AcmClient
                             user = new hduUser(username, password);
                             hduUser.setUserJson(user);
                         }
-                        else
-                        {
+                     
                             hduHttpHelper.getPersonalInfo(user, this);
-                        }
+                       
                     }
                     break;
                 case 2:
@@ -106,11 +105,12 @@ namespace AcmClient
 
         private void SubmitAction(object sender, RoutedEventArgs e)
         {
-            
+            SubmitWindow subWindow = new SubmitWindow(user);
+            subWindow.Show();
         }
     }
 }
-class hduUser
+public class hduUser
 {
     public String UserName;
     public String Password;
@@ -121,8 +121,16 @@ class hduUser
     }
     static public hduUser readUserJson()
     {
-       
-        String str=System.IO.File.ReadAllText(@"user.json");
+        String str;
+        try
+        {
+           str = System.IO.File.ReadAllText(@"user.json");
+        }
+        catch(Exception e)
+        {
+            return null;
+        }
+        
         hduUser user = JsonConvert.DeserializeObject<hduUser>(str);
         return user;
     }
@@ -147,7 +155,7 @@ class hduHttpHelper
         client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36");
         return client;
     }
-    static async void login(hduUser user)
+    static void login(hduUser user)
     {
         client = initClient();
         HttpResponseMessage response;
@@ -158,7 +166,7 @@ class hduHttpHelper
         response = client.PostAsync(new Url(loginUrl), new FormUrlEncodedContent(form)).Result;
         Console.WriteLine(response);
     }
-    static async public void submit(hduUser user,String problemId,String userCode)
+    static public void submit(hduUser user, String problemId, String userCode)
     {
         login(user);
         HttpResponseMessage response;
