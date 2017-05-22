@@ -103,6 +103,11 @@ namespace AcmClient
         {
             Clipboard.SetDataObject(problem.sampleInput, true);
         }
+
+        private void SubmitAction(object sender, RoutedEventArgs e)
+        {
+            
+        }
     }
 }
 class hduUser
@@ -133,6 +138,7 @@ class hduHttpHelper
     static String url = "http://acm.hdu.edu.cn/";
     static String loginUrl = "http://acm.hdu.edu.cn/userloginex.php?action=login";
     static String userStateUrl = "http://acm.hdu.edu.cn/userstatus.php?user=";
+    static String submitUrl = "http://acm.hdu.edu.cn/submit.php?action=submit";
     static HttpClient client;
     static HttpClient initClient()
     {
@@ -150,6 +156,19 @@ class hduHttpHelper
         form.Add(new KeyValuePair<string, string>("userpass", user.Password));
         form.Add(new KeyValuePair<string, string>("login", "Sign In"));
         response = client.PostAsync(new Url(loginUrl), new FormUrlEncodedContent(form)).Result;
+        Console.WriteLine(response);
+    }
+    static async public void submit(hduUser user,String problemId,String userCode)
+    {
+        login(user);
+        HttpResponseMessage response;
+        List<KeyValuePair<String, String>> form = new List<KeyValuePair<string, string>>();
+        form.Add(new KeyValuePair<string, string>("check", "0"));
+        form.Add(new KeyValuePair<string, string>("problemid", problemId));
+        form.Add(new KeyValuePair<string, string>("language", "0"));
+        form.Add(new KeyValuePair<string, string>("usercode", userCode));
+        response = client.PostAsync(new Url(submitUrl), new FormUrlEncodedContent(form)).Result;
+        Console.WriteLine(response);
     }
     static async public void getPersonalInfo(hduUser user , MainWindow mainWindow)
     {
