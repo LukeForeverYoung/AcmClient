@@ -21,15 +21,22 @@ namespace AcmClient
     public partial class SubmitWindow : MetroWindow
     {
         hduUser user;
-        public SubmitWindow(hduUser user)
+        MainWindow mainWindow;
+        public SubmitWindow(hduUser user, MainWindow mainWindow)
         {
-            
+            this.user = user;
+           
             InitializeComponent();
+            this.mainWindow = mainWindow;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            hduHttpHelper.submit(user,)
+            TextRange tr = new TextRange(Code.Document.ContentStart, Code.Document.ContentEnd);
+            hduHttpHelper.submit(user,ProblemId.Text, tr.Text);
+            mainWindow.addSubmitQueryQueue();
+            
+            this.Close();
         }
     }
 }

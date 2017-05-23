@@ -27,7 +27,7 @@
 				<ComboBoxItem Content="C#"/>
 			</ComboBox>
 		</Canvas>
-		<RichTextBox Grid.Row="1" BorderBrush="LightBlue" BorderThickness="1" Margin="5,10,5,5"/>
+		<RichTextBox Name="Code" Grid.Row="1" BorderBrush="LightBlue" BorderThickness="1" Margin="5,10,5,5"/>
 		<Button Content="Submit" Grid.Row="2" Height="20" Click="Button_Click" Padding="0,0,0,0"/>
 	</Grid>
 </Controls:MetroWindow>
