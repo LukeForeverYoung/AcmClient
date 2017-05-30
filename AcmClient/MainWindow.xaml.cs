@@ -42,10 +42,11 @@ namespace AcmClient
         Queue<String> submitQueryQueue;
         Thread queueSubmitStateThread;
         judgeStateToast toast = new judgeStateToast();
-        Queue<String> problemHistoryArray;
+        List<String> problemHistoryArray;
+        String pageId;
         public MainWindow()
         {
-            problemHistoryArray = new Queue<string>();
+            problemHistoryArray = new List<string>();
             user = hduUser.readUserJson();
             InitializeComponent();
             ProblemHistorySelector.ItemsSource = problemHistoryArray;
@@ -105,7 +106,6 @@ namespace AcmClient
         private async void Tab_SelectionChangedAsync(object sender, SelectionChangedEventArgs e)
         {
             TabControl x = sender as TabControl;
-            Console.WriteLine("123");
             switch (x.SelectedIndex)
             {
                 case 0:
@@ -129,8 +129,8 @@ namespace AcmClient
                             return;
                         }
                         
-                        hduHttpHelper.getProblemInfo(user, "1000", this);
-                        addProblemHistory("1000");
+                        
+                        
                     }
                     break;
             }
@@ -157,7 +157,8 @@ namespace AcmClient
 
         private void SubmitAction(object sender, RoutedEventArgs e)
         {
-            SubmitWindow subWindow = new SubmitWindow(user, this);
+            Console.WriteLine("123"+pageId);
+            SubmitWindow subWindow = new SubmitWindow(user,pageId, this);
             subWindow.Show();
         }
         public void addSubmitQueryQueue()
@@ -169,7 +170,6 @@ namespace AcmClient
                 if (submitQueryQueue.Count == 1)
                 {
                     queueSubmitStateThread.Start();
-                    //Console.WriteLine("123");
                 }
             }
         }
@@ -181,21 +181,35 @@ namespace AcmClient
         }
         private void addProblemHistory(String s)
         {
-            
-                for(int i=0;i<problemHistoryArray.Count;i++)
+            pageId = s;
+            for(int i=0;i<problemHistoryArray.Count;i++)
+            {
+                if(problemHistoryArray.ElementAt(i).CompareTo(s)==0)
                 {
-                    if(problemHistoryArray.ElementAt(i).CompareTo(s)==0)
-                    {
-                        ProblemHistorySelector.SelectedIndex = i;
-                        Console.WriteLine(s + ' ' + problemHistoryArray.ElementAt(i));
-                        return;
-                    }
+                    ProblemHistorySelector.SelectedIndex = i;
+                    return;
                 }
-            if (problemHistoryArray.Count > 5) problemHistoryArray.Dequeue();
-            
-            problemHistoryArray.Enqueue(s);
-            ProblemHistorySelector.SelectedIndex=0;
+            }
+            if (problemHistoryArray.Count >= 5)
+            {
+                for (int i = 1; i < problemHistoryArray.Count; i++)
+                    problemHistoryArray[i - 1] = problemHistoryArray[i];
+                problemHistoryArray[problemHistoryArray.Count - 1] = s;
+               
+            }
+            else
+                problemHistoryArray.Add(s);
+            foreach (String ss in problemHistoryArray)
+                Console.Write(ss + " ");
+            Console.WriteLine();
             //ProblemHistorySelector.
+        }
+
+        private void SelectChanged(object sender, SelectionChangedEventArgs e)
+        {
+            String id = (sender as ComboBox).SelectedItem.ToString();
+            pageId = id;
+            hduHttpHelper.getProblemInfo(user, id, this);
         }
     }
 }

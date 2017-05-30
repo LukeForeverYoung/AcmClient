@@ -23,12 +23,13 @@ namespace AcmClient
         hduUser user;
         MainWindow mainWindow;
         
-        public SubmitWindow(hduUser user, MainWindow mainWindow)
+        public SubmitWindow(hduUser user,String Id, MainWindow mainWindow)
         {
             this.user = user;
            
             InitializeComponent();
             this.mainWindow = mainWindow;
+            this.ProblemId.Text = Id;
         }
 
         private void Submit(object sender, RoutedEventArgs e)

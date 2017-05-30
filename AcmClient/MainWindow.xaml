@@ -83,20 +83,22 @@
 
 			</TabItem>
 			<TabItem Header="题目页面" Background="#CCFFFF">
-				<DockPanel  >
+				<DockPanel>
 					<DockPanel DockPanel.Dock="Top">
-						<ComboBox Name="ProblemHistorySelector" DockPanel.Dock="Left" Width="50" SelectedIndex="0">
-							
+						<ComboBox Name="ProblemHistorySelector" 
+								DockPanel.Dock="Left" SelectionChanged="SelectChanged"
+								Width="50" AlternationCount="5" >
 						</ComboBox>
-						<TextBlock Text="Head" Width="500" 
+						<TextBlock Text="{Binding ElementName=ProblemHead,Path=Text}" Width="500" 
 							VerticalAlignment="Center" TextAlignment="Center"/>
-						<Button Style="{StaticResource MaterialDesignRaisedButton}"  DockPanel.Dock="Right" Content="搜索" Click="searchProblemClick"/>
-						<TextBox DockPanel.Dock="Right" Text="搜索题目"
+						<Button Style="{StaticResource MaterialDesignRaisedButton}"  DockPanel.Dock="Right" Content="Go" Click="searchProblemClick"/>
+						<TextBox DockPanel.Dock="Right" Text="跳转题号"
 							Margin="0,0,10,0"
 							BorderBrush="LightBlue"
 							Name="SearchProblemText"/>
-
+						
 					</DockPanel>
+					
 					<Grid Name="VB" DockPanel.Dock="Bottom">
 						<ScrollViewer VerticalScrollBarVisibility="Auto" Style="{StaticResource MaterialDesignScrollViewer}" Height="{Binding Path=Height,ElementName=VB}" Name="ProblemScroll" >
 							<StackPanel Orientation="Vertical" Name="ProblemPage">
