@@ -85,16 +85,16 @@
 			<TabItem Header="题目页面" Background="#CCFFFF">
 				<DockPanel  >
 					<DockPanel DockPanel.Dock="Top">
-						<ComboBox DockPanel.Dock="Left" Width="50" SelectedIndex="0">
-							<ComboBoxItem Content="111"/>
-							<ComboBoxItem Content="222"/>
+						<ComboBox Name="ProblemHistorySelector" DockPanel.Dock="Left" Width="50" SelectedIndex="0">
+							
 						</ComboBox>
 						<TextBlock Text="Head" Width="500" 
 							VerticalAlignment="Center" TextAlignment="Center"/>
-						<Button Style="{StaticResource MaterialDesignRaisedButton}"  DockPanel.Dock="Right" Content="搜索"/>
+						<Button Style="{StaticResource MaterialDesignRaisedButton}"  DockPanel.Dock="Right" Content="搜索" Click="searchProblemClick"/>
 						<TextBox DockPanel.Dock="Right" Text="搜索题目"
 							Margin="0,0,10,0"
-							BorderBrush="LightBlue"/>
+							BorderBrush="LightBlue"
+							Name="SearchProblemText"/>
 
 					</DockPanel>
 					<Grid Name="VB" DockPanel.Dock="Bottom">
@@ -151,7 +151,7 @@
 								</materialDesign:Card>
 								<TextBox Text="Sample Output" Style="{StaticResource CardLable}"/>
 								<materialDesign:Card>
-									<TextBox Text="{Binding sampleOutput}"/>
+									<TextBox Text="{Binding sampleOutput}" Name="SampleInputTextBox"/>
 								</materialDesign:Card>
 
 								<UniformGrid Margin="0,10,0,0">

@@ -39,23 +39,22 @@ namespace AcmClient
     public partial class MainWindow : MetroWindow
     {
         hduUser user;
-        problemInfomation problem;
         Queue<String> submitQueryQueue;
         Thread queueSubmitStateThread;
         judgeStateToast toast = new judgeStateToast();
+        Queue<String> problemHistoryArray;
         public MainWindow()
         {
-            
+            problemHistoryArray = new Queue<string>();
             user = hduUser.readUserJson();
             InitializeComponent();
-            
+            ProblemHistorySelector.ItemsSource = problemHistoryArray;
             tab.SelectionChanged += Tab_SelectionChangedAsync;
             submitQueryQueue = new Queue<string>();
             queueSubmitStateThread = new Thread(new ThreadStart(() =>
             {
                 while (true)
                 {
-                    
                     lock (submitQueryQueue)
                     {
                         if (submitQueryQueue.Count == 0) break;
@@ -64,29 +63,53 @@ namespace AcmClient
                         submitInfo Item = hduHttpHelper.checkSubmitState(nowId, user);
                         if (Item.State != "Queuing" && Item.State != "Compiling" && Item.State != "Running")
                         {
-                            if(Item.State=="Accepted")
+                            if (Item.State == "Accepted")
                             {
-                                
+                                this.Invoke(new Action(() =>
+                                {
+                                    judgeStateToast toast = new judgeStateToast();
+                                    toast.Accepted(Item.ProblemId+'\t'+Item.Time+'\t'+Item.Memory);
+                                }));
+                            }
+                            else if(Item.State== "Presentation Error")
+                            {
+                                this.Invoke(new Action(() =>
+                                {
+                                    judgeStateToast toast = new judgeStateToast();
+                                    toast.Warning(Item.ProblemId + '\t' + Item.Time + '\t' + Item.Memory);
+                                }));
+                            }
+                            else
+                            {
+                                this.Invoke(new Action(() =>
+                                {
+                                    judgeStateToast toast = new judgeStateToast();
+                                    toast.Error(Item.ProblemId + '\t' + Item.Time + '\t' + Item.Memory);
+                                }));
                             }
                             Console.WriteLine(Item.State);
-                            
+
                         }
                         else
                             submitQueryQueue.Enqueue(nowId);
                     }
                     Thread.Sleep(500);
                 }
-            }));
+            }))
+            {
+                IsBackground = true
+            };
+            
         }
 
         private async void Tab_SelectionChangedAsync(object sender, SelectionChangedEventArgs e)
         {
             TabControl x = sender as TabControl;
+            Console.WriteLine("123");
             switch (x.SelectedIndex)
             {
                 case 0:
                     {
-                        
                         if (user == null)
                         {
                             LoginDialogData result = await this.ShowLoginAsync("请先登录hdu账号", "输入账号与密码", new LoginDialogSettings { ColorScheme = this.MetroDialogOptions.ColorScheme, InitialUsername = "UserName" });
@@ -95,22 +118,19 @@ namespace AcmClient
                             user = new hduUser(username, password);
                             hduUser.setUserJson(user);
                         }
-
                         hduHttpHelper.getPersonalInfo(user, this);
-
                     }
                     break;
                 case 2:
                     {
-                        
                         if (user == null)
                         {
                             Console.WriteLine("no user error!");
                             return;
                         }
-                        problem = new problemInfomation();
-                        hduHttpHelper.getProblemInfo(user, problem, "1001", this);
-
+                        
+                        hduHttpHelper.getProblemInfo(user, "1000", this);
+                        addProblemHistory("1000");
                     }
                     break;
             }
@@ -132,7 +152,7 @@ namespace AcmClient
 
         private void CopyInput(object sender, RoutedEventArgs e)
         {
-            Clipboard.SetDataObject(problem.sampleInput, true);
+            Clipboard.SetDataObject(SampleInputTextBox.Text, true);
         }
 
         private void SubmitAction(object sender, RoutedEventArgs e)
@@ -152,6 +172,30 @@ namespace AcmClient
                     //Console.WriteLine("123");
                 }
             }
+        }
+
+        private void searchProblemClick(object sender, RoutedEventArgs e)
+        {
+            hduHttpHelper.getProblemInfo(user, SearchProblemText.Text, this);
+            addProblemHistory(SearchProblemText.Text);
+        }
+        private void addProblemHistory(String s)
+        {
+            
+                for(int i=0;i<problemHistoryArray.Count;i++)
+                {
+                    if(problemHistoryArray.ElementAt(i).CompareTo(s)==0)
+                    {
+                        ProblemHistorySelector.SelectedIndex = i;
+                        Console.WriteLine(s + ' ' + problemHistoryArray.ElementAt(i));
+                        return;
+                    }
+                }
+            if (problemHistoryArray.Count > 5) problemHistoryArray.Dequeue();
+            
+            problemHistoryArray.Enqueue(s);
+            ProblemHistorySelector.SelectedIndex=0;
+            //ProblemHistorySelector.
         }
     }
 }
@@ -254,10 +298,10 @@ class hduHttpHelper
         nowUser.setSubmitValue(rk, sub, sov);
         mainWindow.DataBinding.DataContext = nowUser;
     }
-    static async public void getProblemInfo(hduUser user, problemInfomation problem, String problemID, MainWindow mainWindow)
+    static async public void getProblemInfo(hduUser user, String problemID, MainWindow mainWindow)
     {
-        problemInfomation nowProblem = new problemInfomation();
-
+        problemInfomation problem = new problemInfomation();
+        problem.problemId = problemID;
         login(user);
         String problemUrl = "http://acm.hdu.edu.cn/showproblem.php?pid=" + problemID;
         HttpResponseMessage response;
@@ -456,6 +500,12 @@ class userInfomation : INotifyPropertyChanged
 }
 class problemInfomation : INotifyPropertyChanged
 {
+    String _problemId;
+    public String problemId
+    {
+        get { return _problemId; }
+        set { _problemId = value; }
+    }
     String _problemName;
     public String problemName
     {
@@ -537,24 +587,30 @@ class judgeStateToast
                 cfg.PositionProvider = new WindowPositionProvider(
                 parentWindow: Application.Current.MainWindow,
                 corner: Corner.TopRight,
-                offsetX: 30,
-                offsetY: 30);
+                offsetX: 40,
+                offsetY: 110);
 
             }
             if(cfg.LifetimeSupervisor==null)
             {
                 cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(
-               notificationLifetime: TimeSpan.FromSeconds(3),
+               notificationLifetime: TimeSpan.FromSeconds(5),
                maximumNotificationCount: MaximumNotificationCount.FromCount(5));
             }
-           
-
             cfg.Dispatcher = Application.Current.Dispatcher;
         });
     }
-    public void  Accepted(String s)
+    public void Accepted(String s)
     {
         notifier.ShowSuccess(s);
+    }
+    public void Warning(String s)
+    {
+        notifier.ShowWarning(s);
+    }
+    public void Error(String s)
+    {
+        notifier.ShowError(s);
     }
 }
 

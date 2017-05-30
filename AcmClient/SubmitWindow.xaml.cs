@@ -22,6 +22,7 @@ namespace AcmClient
     {
         hduUser user;
         MainWindow mainWindow;
+        
         public SubmitWindow(hduUser user, MainWindow mainWindow)
         {
             this.user = user;
@@ -30,12 +31,11 @@ namespace AcmClient
             this.mainWindow = mainWindow;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Submit(object sender, RoutedEventArgs e)
         {
             TextRange tr = new TextRange(Code.Document.ContentStart, Code.Document.ContentEnd);
             hduHttpHelper.submit(user,ProblemId.Text, tr.Text);
             mainWindow.addSubmitQueryQueue();
-            
             this.Close();
         }
     }
