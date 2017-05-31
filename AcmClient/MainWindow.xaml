@@ -22,7 +22,7 @@
 			<TabItem Header="个人信息" Background="#CCFFFF">
 				<Grid Name="personalPage">
 					<Grid.RowDefinitions>
-						<RowDefinition Height="1*"/>
+						<RowDefinition Height="5*"/>
 						<RowDefinition Height="*"/>
 					</Grid.RowDefinitions>
 					<materialDesign:Card Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="20,20,20,20">
@@ -33,41 +33,36 @@
 								</Style>
 
 							</Grid.Resources>
-							<Grid.ColumnDefinitions>
-								<!--个人信息左中右-->
-								<ColumnDefinition Width="5*"/>
-								<ColumnDefinition Width="4*"/>
-								<ColumnDefinition Width="2*"/>
-							</Grid.ColumnDefinitions>
-
-							<StackPanel Grid.Column="0" Name="ValueInfo" Orientation="Vertical">
-								<StackPanel Orientation="Horizontal">
-									<TextBlock VerticalAlignment="Center" Text="Rank: "/>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="10*"/>
+								<RowDefinition Height="3*"/>
+							</Grid.RowDefinitions>
+							<StackPanel Grid.Row="1" Name="ValueInfo" Orientation="Horizontal">
+								<StackPanel Orientation="Vertical" Margin="30,30,30,30">
 									<TextBlock VerticalAlignment="Center" Text="{Binding Rank}"/>
+									<TextBlock VerticalAlignment="Center" Text="Rank"/>
 								</StackPanel>
-								<StackPanel Orientation="Horizontal">
-									<TextBlock VerticalAlignment="Center" Text="Problems Submitted: "/>
+								<StackPanel Orientation="Vertical" Margin="30,30,30,30">
 									<TextBlock VerticalAlignment="Center" Text="{Binding Submitted}"/>
+									<TextBlock VerticalAlignment="Center" Text="Problems Submitted"/>
 								</StackPanel>
-								<StackPanel Orientation="Horizontal">
-									<TextBlock VerticalAlignment="Center" Text="Problems Solved: "/>
+								<StackPanel Orientation="Vertical" Margin="30,30,30,30">
 									<TextBlock VerticalAlignment="Center" Text="{Binding Solved}"/>
+									<TextBlock VerticalAlignment="Center" Text="Problems Solved"/>
 								</StackPanel>
-
 							</StackPanel>
-							<GridSplitter IsEnabled="False" Grid.Column="1" Width="2" HorizontalAlignment="Stretch" Margin="42,0,228,0"/>
-							<Grid Name="UserBlock" Grid.Column="2">
+							<!--<GridSplitter IsEnabled="False" Grid.Column="1" Width="2" HorizontalAlignment="Stretch" Margin="42,0,228,0"/>-->
+							<Grid Name="UserBlock" Grid.Row="0">
 								<Grid.RowDefinitions>
 									<!--头像区设定-->
 									<RowDefinition Height="5*"/>
 									<RowDefinition Height="2*"/>
 									<RowDefinition Height="1*"/>
 								</Grid.RowDefinitions>
-								<materialDesign:Card  Background="LightGray" UniformCornerRadius="10">
-									<Grid>
-
-										<Image Grid.Row="0" Source="/Sources/icon.jpg" />
-									</Grid>
+								<materialDesign:Card  Background="LightGray" UniformCornerRadius="10" Width="200" Height="200">
+									
+										<Image  Source="/Sources/icon.jpg" />
+									
 								</materialDesign:Card>
 
 								<TextBlock TextAlignment="Center" Grid.Row="1" Text="{Binding nickName}" FontSize="15"/>

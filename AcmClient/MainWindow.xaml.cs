@@ -141,19 +141,19 @@ namespace AcmClient
                     break;
             }
         }
-        private void setInfoValueLine(object sender, EventArgs e)
-        {
-            var height = ValueInfo.ActualHeight;
-            var width = ValueInfo.ActualWidth;
-            Console.WriteLine(height + "  " + width);
-            Line InfoValueLine = new Line();
-            InfoValueLine.Height = height;
-            InfoValueLine.X1 = InfoValueLine.X2 = width;
-            InfoValueLine.Y1 = 10;
-            InfoValueLine.Y2 = height - 10;
-            InfoValueLine.Stroke = Brushes.LightGray;
-            ValueInfo.Children.Add(InfoValueLine);
-        }
+        //private void setInfoValueLine(object sender, EventArgs e)
+        //{
+        //    var height = ValueInfo.ActualHeight;
+        //    var width = ValueInfo.ActualWidth;
+        //    Console.WriteLine(height + "  " + width);
+        //    Line InfoValueLine = new Line();
+        //    InfoValueLine.Height = height;
+        //    InfoValueLine.X1 = InfoValueLine.X2 = width;
+        //    InfoValueLine.Y1 = 10;
+        //    InfoValueLine.Y2 = height - 10;
+        //    InfoValueLine.Stroke = Brushes.LightGray;
+        //    ValueInfo.Children.Add(InfoValueLine);
+        //}
         private void CopyInput(object sender, RoutedEventArgs e)
         {
             Clipboard.SetDataObject(SampleInputTextBox.Text, true);
