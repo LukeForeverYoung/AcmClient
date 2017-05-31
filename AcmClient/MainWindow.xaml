@@ -79,8 +79,10 @@
 					</Grid>
 				</Grid>
 			</TabItem>
-			<TabItem Header="题目分类" Background="#CCFFFF">
-
+			<TabItem Header="题目列表" Background="#CCFFFF">
+				<StackPanel Name="ProblemSet" Orientation="Vertical">
+					
+				</StackPanel>
 			</TabItem>
 			<TabItem Header="题目页面" Background="#CCFFFF">
 				<DockPanel>
@@ -91,7 +93,7 @@
 						</ComboBox>
 						<TextBlock Text="{Binding ElementName=ProblemHead,Path=Text}" Width="500" 
 							VerticalAlignment="Center" TextAlignment="Center"/>
-						<Button Style="{StaticResource MaterialDesignRaisedButton}"  DockPanel.Dock="Right" Content="Go" Click="searchProblemClick"/>
+						<Button Style="{StaticResource MaterialDesignRaisedButton}" Name="GoToProblemButton"  DockPanel.Dock="Right" Content="Go" Click="searchProblemClick"/>
 						<TextBox DockPanel.Dock="Right" Text="跳转题号"
 							Margin="0,0,10,0"
 							BorderBrush="LightBlue"

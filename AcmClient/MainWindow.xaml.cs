@@ -29,6 +29,8 @@ using ToastNotifications;
 using ToastNotifications.Position;
 using ToastNotifications.Lifetime;
 using ToastNotifications.Messages;
+using System.Xml;
+using MaterialDesignThemes.Wpf;
 
 namespace AcmClient
 {
@@ -44,11 +46,13 @@ namespace AcmClient
         judgeStateToast toast = new judgeStateToast();
         List<String> problemHistoryArray;
         String pageId;
+        XmlNodeList ProblemNodeList;
         public MainWindow()
         {
             problemHistoryArray = new List<string>();
             user = hduUser.readUserJson();
             InitializeComponent();
+            loadProblemXml();
             ProblemHistorySelector.ItemsSource = problemHistoryArray;
             tab.SelectionChanged += Tab_SelectionChangedAsync;
             submitQueryQueue = new Queue<string>();
@@ -121,6 +125,11 @@ namespace AcmClient
                         hduHttpHelper.getPersonalInfo(user, this);
                     }
                     break;
+                case 1:
+                    {
+                        SetProblemListPage(0);
+                    }
+                    break;
                 case 2:
                     {
                         if (user == null)
@@ -128,14 +137,10 @@ namespace AcmClient
                             Console.WriteLine("no user error!");
                             return;
                         }
-                        
-                        
-                        
                     }
                     break;
             }
         }
-
         private void setInfoValueLine(object sender, EventArgs e)
         {
             var height = ValueInfo.ActualHeight;
@@ -149,31 +154,17 @@ namespace AcmClient
             InfoValueLine.Stroke = Brushes.LightGray;
             ValueInfo.Children.Add(InfoValueLine);
         }
-
         private void CopyInput(object sender, RoutedEventArgs e)
         {
             Clipboard.SetDataObject(SampleInputTextBox.Text, true);
         }
-
         private void SubmitAction(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine("123"+pageId);
+         
             SubmitWindow subWindow = new SubmitWindow(user,pageId, this);
             subWindow.Show();
         }
-        public void addSubmitQueryQueue()
-        {
-            String RunId = hduHttpHelper.getSubmitRunId(user);
-            lock (submitQueryQueue)
-            {
-                submitQueryQueue.Enqueue(RunId);
-                if (submitQueryQueue.Count == 1)
-                {
-                    queueSubmitStateThread.Start();
-                }
-            }
-        }
-
+       
         private void searchProblemClick(object sender, RoutedEventArgs e)
         {
             hduHttpHelper.getProblemInfo(user, SearchProblemText.Text, this);
@@ -204,12 +195,82 @@ namespace AcmClient
             Console.WriteLine();
             //ProblemHistorySelector.
         }
-
         private void SelectChanged(object sender, SelectionChangedEventArgs e)
         {
+            e.Handled = true;
             String id = (sender as ComboBox).SelectedItem.ToString();
             pageId = id;
             hduHttpHelper.getProblemInfo(user, id, this);
+        }
+        private void loadProblemXml()
+        {
+            XmlDocument xml = new XmlDocument();
+            xml.Load(@"../../Sources/ProblemList.xml");
+            ProblemNodeList = xml.GetElementsByTagName("Problem");
+        }
+        private void SetProblemListPage(int pageNum)
+        {
+            const int PageContainSize = 20;
+            int startIndex = pageNum*PageContainSize;
+            int endIndex = startIndex+20;
+            if(startIndex>=ProblemNodeList.Count)
+                return;
+            if (endIndex > ProblemNodeList.Count)
+                endIndex = ProblemNodeList.Count;
+            ProblemSet.Children.Clear();
+            for(int i=startIndex;i<endIndex;i++)
+            {
+                var nowProblem = ProblemNodeList.Item(i);
+                Card ProblemCard = new Card();
+                ProblemCard.Tag = nowProblem.Attributes["id"].Value;
+                Canvas CardContent = new Canvas();
+                ProblemCard.Width = this.ActualWidth * 0.8;
+                ProblemCard.Height = 100;
+                TextBlock Problem=new TextBlock();
+                TextBlock Rate = new TextBlock();
+                TextBlock PassOrSubmit = new TextBlock();
+                Problem.Text = nowProblem.Attributes["Name"].Value;
+                Problem.FontSize = 20;
+                Problem.Margin = new Thickness(20, 10,0,0);
+                CardContent.Children.Add(Problem);
+                int ac = Int32.Parse(nowProblem.Attributes["acSum"].Value);
+                int sub = Int32.Parse(nowProblem.Attributes["subSum"].Value);
+               // Console.WriteLine((ac * 1.0 / sub).ToString());
+                Rate.Text ="通过率 : "+(ac*1.0/sub).ToString("f2");
+                Rate.FontSize = 15;Rate.Margin = new Thickness(20, 50, 0, 0);Rate.Foreground = Brushes.LightGray;
+                CardContent.Children.Add(Rate);
+                PassOrSubmit.Text ="通过人数:  "+ac.ToString() + "/" + sub.ToString();
+                PassOrSubmit.FontSize = 15;PassOrSubmit.Margin = new Thickness(200, 50, 0, 0);PassOrSubmit.Foreground = Brushes.LightBlue;
+                CardContent.Children.Add(PassOrSubmit);
+                ProblemCard.MouseLeftButtonUp += EnterProblem;
+                ProblemCard.Content = CardContent;
+                ProblemCard.Margin = new Thickness(0, 20, 0, 0);
+                ProblemSet.Children.Add(ProblemCard);
+                
+                Console.WriteLine("setok");
+            }
+            
+        }
+
+        private void EnterProblem(object sender, MouseButtonEventArgs e)
+        {
+            Card card = sender as Card;
+            SearchProblemText.Text = card.Tag.ToString();
+            searchProblemClick(GoToProblemButton, null);
+            tab.SelectedIndex = 2;
+        }
+
+        public void addSubmitQueryQueue()
+        {
+            String RunId = hduHttpHelper.getSubmitRunId(user);
+            lock (submitQueryQueue)
+            {
+                submitQueryQueue.Enqueue(RunId);
+                if (submitQueryQueue.Count == 1)
+                {
+                    queueSubmitStateThread.Start();
+                }
+            }
         }
     }
 }
