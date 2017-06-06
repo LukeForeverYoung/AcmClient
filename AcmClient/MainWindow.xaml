@@ -91,9 +91,12 @@
 
 			</TabItem>
 			<TabItem Header="题目列表" Background="#CCFFFF">
-				<StackPanel Name="ProblemSet" Orientation="Vertical">
+				<ScrollViewer>
+					<StackPanel Name="ProblemSet" Orientation="Vertical">
 
-				</StackPanel>
+					</StackPanel>
+				</ScrollViewer>
+				
 			</TabItem>
 			<TabItem Header="题目页面" Background="#CCFFFF">
 				<DockPanel>

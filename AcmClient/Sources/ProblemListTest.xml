@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ProblemSet>
+    <Problem id="1002" Name="A + B Problem II" url="baidu.com" acSum="12344" subSum="23456">
+        <Blog url="123"/>
+        <Blog url="234"/>
+    </Problem>
+    <Problem id="1003" Name="测试用题" url="baidu.com" acSum="0" subSum="23456">
+        <Blog url="123"/>
+        <Blog url="234"/>
+    </Problem>
+</ProblemSet>

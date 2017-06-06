@@ -203,8 +203,11 @@ namespace AcmClient
         private void loadProblemXml()
         {
             XmlDocument xml = new XmlDocument();
-            xml.Load(@"../../Sources/ProblemList.xml");
+            
+             xml.Load(@"../../Sources/ProblemList.xml"); 
+            
             ProblemNodeList = xml.GetElementsByTagName("Problem");
+            Console.WriteLine(ProblemNodeList.Count);
         }//导入XML
         private void SetProblemListPage(int pageNum)
         {
@@ -656,7 +659,7 @@ class judgeStateToast//封装了判题结果返回的Toast各类效果以及初�
                 cfg.PositionProvider = new WindowPositionProvider(
                 parentWindow: Application.Current.MainWindow,
                 corner: Corner.TopRight,
-                offsetX: 40,
+                offsetX: 80,
                 offsetY: 110);
 
             }
