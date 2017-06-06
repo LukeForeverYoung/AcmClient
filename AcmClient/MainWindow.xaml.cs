@@ -38,23 +38,23 @@ namespace AcmClient
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
     /// 
-    public partial class MainWindow : MetroWindow
+    public partial class MainWindow : MetroWindow//主窗体类
     {
-        hduUser user;
-        Queue<String> submitQueryQueue;
-        Thread queueSubmitStateThread;
-        judgeStateToast toast = new judgeStateToast();
-        List<String> problemHistoryArray;
-        String pageId;
-        XmlNodeList ProblemNodeList;
-        public MainWindow()
+        hduUser user;//用户信息维护
+        Queue<String> submitQueryQueue;//提交等待队列
+        Thread queueSubmitStateThread;//提交结果检查线程
+        judgeStateToast toast = new judgeStateToast();//提交结果Toast
+        List<String> problemHistoryArray;//历史题目列表
+        String pageId;//页面号
+        XmlNodeList ProblemNodeList;//题目列表
+        public MainWindow()//主窗体初始化
         {
             problemHistoryArray = new List<string>();
-            user = hduUser.readUserJson();
-            InitializeComponent();
-            loadProblemXml();
-            ProblemHistorySelector.ItemsSource = problemHistoryArray;
-            tab.SelectionChanged += Tab_SelectionChangedAsync;
+            user = hduUser.readUserJson();//导入用户文件，因为第一屏需要用户信息，所以在前端初始化之前
+            InitializeComponent();//前端初始化
+            loadProblemXml();//导入XML文件
+            ProblemHistorySelector.ItemsSource = problemHistoryArray;//数据源设定
+            tab.SelectionChanged += Tab_SelectionChangedAsync;//绑定Tab切换事件
             submitQueryQueue = new Queue<string>();
             queueSubmitStateThread = new Thread(new ThreadStart(() =>
             {
@@ -100,13 +100,12 @@ namespace AcmClient
                     }
                     Thread.Sleep(500);
                 }
-            }))
+            }))//申明线程及其运行时匿名函数
             {
                 IsBackground = true
             };
             
         }
-
         private async void Tab_SelectionChangedAsync(object sender, SelectionChangedEventArgs e)
         {
             TabControl x = sender as TabControl;
@@ -140,7 +139,7 @@ namespace AcmClient
                     }
                     break;
             }
-        }
+        }//Tab切换事件，完成各Tab页的生成操作
         //private void setInfoValueLine(object sender, EventArgs e)
         //{
         //    var height = ValueInfo.ActualHeight;
@@ -157,19 +156,18 @@ namespace AcmClient
         private void CopyInput(object sender, RoutedEventArgs e)
         {
             Clipboard.SetDataObject(SampleInputTextBox.Text, true);
-        }
+        }//一键赋值按钮函数
         private void SubmitAction(object sender, RoutedEventArgs e)
         {
          
             SubmitWindow subWindow = new SubmitWindow(user,pageId, this);
             subWindow.Show();
-        }
-       
+        }//弹出提交代码窗口
         private void searchProblemClick(object sender, RoutedEventArgs e)
         {
             hduHttpHelper.getProblemInfo(user, SearchProblemText.Text, this);
             addProblemHistory(SearchProblemText.Text);
-        }
+        }//跳转题目按钮点击函数
         private void addProblemHistory(String s)
         {
             pageId = s;
@@ -194,20 +192,20 @@ namespace AcmClient
                 Console.Write(ss + " ");
             Console.WriteLine();
             //ProblemHistorySelector.
-        }
+        }//加入历史纪录
         private void SelectChanged(object sender, SelectionChangedEventArgs e)
         {
             e.Handled = true;
             String id = (sender as ComboBox).SelectedItem.ToString();
             pageId = id;
             hduHttpHelper.getProblemInfo(user, id, this);
-        }
+        }//历史纪录Select切换
         private void loadProblemXml()
         {
             XmlDocument xml = new XmlDocument();
             xml.Load(@"../../Sources/ProblemList.xml");
             ProblemNodeList = xml.GetElementsByTagName("Problem");
-        }
+        }//导入XML
         private void SetProblemListPage(int pageNum)
         {
             const int PageContainSize = 20;
@@ -250,16 +248,14 @@ namespace AcmClient
                 Console.WriteLine("setok");
             }
             
-        }
-
+        }//导入题目列表
         private void EnterProblem(object sender, MouseButtonEventArgs e)
         {
             Card card = sender as Card;
             SearchProblemText.Text = card.Tag.ToString();
             searchProblemClick(GoToProblemButton, null);
             tab.SelectedIndex = 2;
-        }
-
+        }//构建题目页面
         public void addSubmitQueryQueue()
         {
             String RunId = hduHttpHelper.getSubmitRunId(user);
@@ -271,13 +267,13 @@ namespace AcmClient
                     queueSubmitStateThread.Start();
                 }
             }
-        }
+        }//添加提交信息进入等待队列
     }
 }
-public class hduUser
+public class hduUser//用户信息类
 {
-    public String UserName;
-    public String Password;
+    public String UserName;//用户名
+    public String Password;//密码
     public hduUser(String u, String p)
     {
         UserName = u;
@@ -297,28 +293,28 @@ public class hduUser
 
         hduUser user = JsonConvert.DeserializeObject<hduUser>(str);
         return user;
-    }
+    }//读Json信息
     static public void setUserJson(hduUser user)
     {
         String str = JsonConvert.SerializeObject(user);
         Console.WriteLine(str);
         System.IO.File.WriteAllText(@"user.json", str, Encoding.UTF8);
-    }
+    }//写Json信息
 }
-class hduHttpHelper
+class hduHttpHelper//封装所有关于杭电的Http操作的代码
 {
     static String url = "http://acm.hdu.edu.cn/";
     static String loginUrl = "http://acm.hdu.edu.cn/userloginex.php?action=login";
     static String userStateUrl = "http://acm.hdu.edu.cn/userstatus.php?user=";
     static String submitUrl = "http://acm.hdu.edu.cn/submit.php?action=submit";
-    static HttpClient client;
+    static HttpClient client;//Http请求发送端
     static HttpClient initClient()
     {
         HttpClient client = new HttpClient();
         client.MaxResponseContentBufferSize = 256000;
         client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36");
         return client;
-    }
+    }//初始化client
     static void login(hduUser user)
     {
         client = initClient();
@@ -329,7 +325,7 @@ class hduHttpHelper
         form.Add(new KeyValuePair<string, string>("login", "Sign In"));
         response = client.PostAsync(new Url(loginUrl), new FormUrlEncodedContent(form)).Result;
         //Console.WriteLine(response);
-    }
+    }//登录，用于保持用户在线
     static public void submit(hduUser user, String problemId, String userCode)
     {
         login(user);
@@ -341,7 +337,7 @@ class hduHttpHelper
         form.Add(new KeyValuePair<string, string>("usercode", userCode));
         response = client.PostAsync(new Url(submitUrl), new FormUrlEncodedContent(form)).Result;
         //Console.WriteLine(response);
-    }
+    }//模拟http post请求发送代码
     static async public void getPersonalInfo(hduUser user, MainWindow mainWindow)
     {
         login(user);
@@ -372,7 +368,7 @@ class hduHttpHelper
         var sov = Int32.Parse(valueTable[3].LastElementChild.Text());
         nowUser.setSubmitValue(rk, sub, sov);
         mainWindow.DataBinding.DataContext = nowUser;
-    }
+    }//获取用户信息
     static async public void getProblemInfo(hduUser user, String problemID, MainWindow mainWindow)
     {
         problemInfomation problem = new problemInfomation();
@@ -396,7 +392,7 @@ class hduHttpHelper
         mainWindow.ProblemPage.DataContext = problem;
 
         //Console.WriteLine(problem.problemValue);
-    }
+    }//获取题目信息
     static private String getTextWithWrap(AngleSharp.Dom.INodeList NodeList)
     {
         var tempString = "";
@@ -421,7 +417,7 @@ class hduHttpHelper
 
         }
         return tempString;
-    }
+    }//对获取到的换行不规则文本进行修正
     static private IHtmlDocument connectAsync(String url)
     {
         client = initClient();
@@ -431,8 +427,7 @@ class hduHttpHelper
         var parser = new HtmlParser();
         var document = parser.Parse(responseString);
         return document;
-    }
-
+    }//连接封装
     static public submitInfo checkSubmitState(string RunId, hduUser user)
     {
         String url = "http://acm.hdu.edu.cn/status.php?first=+" + RunId + "+&user=" + user.UserName;
@@ -445,8 +440,7 @@ class hduHttpHelper
         Item.Memory = submitItem.Children[5].Text();
         Item.State = submitItem.Children[2].FirstChild.Text();
         return Item;
-    }
-
+    }//检查提交状态
     static public String getSubmitRunId(hduUser user)
     {
         //didn't use login();
@@ -455,11 +449,11 @@ class hduHttpHelper
         var submitItem = document.GetElementsByClassName("table_text")[0].Children[0].Children[2];
         var runId = submitItem.Children[0].Text();
         return runId;
-    }
+    }//获取提交条目的RunId
     hduHttpHelper()
     {
         client = initClient();
-    }
+    }//初始化
 }
 class submitInfo
 {
@@ -468,9 +462,9 @@ class submitInfo
     public String State;
     public String Time;
     public String Memory;
-    public String Compiler;
+    //public String Compiler;
 }
-class userInfomation : INotifyPropertyChanged
+class userInfomation : INotifyPropertyChanged//用户信息类，为了便于数据绑定，关键信息都使用get\set方法
 {
     String _nickName;
     String _School;
@@ -573,7 +567,7 @@ class userInfomation : INotifyPropertyChanged
         }
     }
 }
-class problemInfomation : INotifyPropertyChanged
+class problemInfomation : INotifyPropertyChanged//题目信息类，和用户信息类似
 {
     String _problemId;
     public String problemId
@@ -650,7 +644,7 @@ class problemInfomation : INotifyPropertyChanged
         }
     }
 }
-class judgeStateToast
+class judgeStateToast//封装了判题结果返回的Toast各类效果以及初始化
 {
     private Notifier notifier;
     public judgeStateToast()
@@ -688,5 +682,3 @@ class judgeStateToast
         notifier.ShowError(s);
     }
 }
-
-
